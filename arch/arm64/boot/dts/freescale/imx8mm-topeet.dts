@@ -71,7 +71,7 @@
 	wakeup-source;
 	mmc-pwrseq = <&usdhc1_pwrseq>;
 	fsl,sdio-async-interrupt-enabled;
-	status = "okay";
+	status = "disabled";
 
 	wifi_wake_host {
 		compatible = "nxp,wifi-wake-host";
