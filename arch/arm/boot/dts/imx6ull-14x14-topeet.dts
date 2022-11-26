@@ -10,6 +10,29 @@
 / {
 	model = "Freescale i.MX6 ULL 14x14 TOPEET Board";
 	compatible = "fsl,imx6ull-14x14-topeet", "fsl,imx6ull";
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-0 = <&pinctrl_leds>;
+		led {
+			label = "led";
+			gpios = <&gpio1 3 GPIO_ACTIVE_LOW>;
+			linux,default-trigger = "heartbeat";
+			default-state = "on";
+		};
+	};
+
+	keys {
+		compatible = "gpio-keys";
+		pinctrl-0 = <&pinctrl_keys>;
+		autorepeat;
+
+		key0 {
+			label = "key0";
+			linux,code = <KEY_ENTER>;
+			gpios = <&gpio1 18 GPIO_ACTIVE_LOW>;
+		};
+	};
 };
 
 &clks {
@@ -37,3 +60,16 @@
 };
 
 /delete-node/ &sim2;
+
+&iomuxc {
+	pinctrl_leds: ledsgrp {
+		fsl,pins = <
+			MX6UL_PAD_GPIO1_IO03__GPIO1_IO03		0xb0
+		>;
+	};
+	pinctrl_keys: keysgrp {
+		fsl,pins = <
+			MX6UL_PAD_UART1_CTS_B__GPIO1_IO18       0xf080
+		>;
+	};
+};
