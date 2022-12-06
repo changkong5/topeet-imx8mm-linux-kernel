@@ -34,7 +34,7 @@
 
 #define DRIVER_NAME "rtl8xxxu"
 
-int rtl8xxxu_debug = RTL8XXXU_DEBUG_EFUSE;
+int rtl8xxxu_debug = 0/*RTL8XXXU_DEBUG_EFUSE*/;
 static bool rtl8xxxu_ht40_2g;
 static bool rtl8xxxu_dma_aggregation;
 static int rtl8xxxu_dma_agg_timeout = -1;
@@ -6566,6 +6566,7 @@ static int rtl8xxxu_probe(struct usb_interface *interface,
 		case 0x8178:
 		case 0x817f:
 		case 0x818b:
+		case 0xb720:
 			untested = 0;
 			break;
 		}
