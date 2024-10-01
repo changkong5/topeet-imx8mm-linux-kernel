@@ -19,8 +19,90 @@
 	usdhc1_pwrseq: usdhc1_pwrseq {
 		compatible = "mmc-pwrseq-simple";
 		pinctrl-names = "default";
-		pinctrl-0 = <&pinctrl_usdhc1_gpio>;
-		reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;
+		// pinctrl-0 = <&pinctrl_usdhc1_gpio>;
+		// reset-gpios = <&gpio2 10 GPIO_ACTIVE_LOW>;
+	};
+
+	clocks {
+		mcp251x_clock: mcp251x_clock{
+			compatible = "fixed-clock";
+			#clock-cells = <0>;
+			clock-frequency = <8000000>;
+		};
+	};
+
+	leds {
+		compatible = "gpio-leds";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_gpio_led>;
+
+		status {
+			label = "status";
+			gpios = <&gpio3 16 0>;
+			default-state = "on";
+		};
+	};
+/*
+	gpio-keys {
+        compatible = "gpio-keys";
+        autorepeat;
+        pinctrl-names = "default";
+        pinctrl-0 = <&pinctrl_gpio_keys>;
+
+        volumeup {
+            label = "GPIO Key VOLUMEUP";
+            linux,code = <115>;
+            gpios = <&gpio4 31 GPIO_ACTIVE_LOW>;
+        };
+
+        volumedown {
+            label = "GPIO Key VOLUMEDOWN";
+            linux,code = <114>;
+            gpios = <&gpio4 28 GPIO_ACTIVE_LOW>;
+        };
+
+        back {
+            label = "GPIO Key BACK";
+            linux,code = <172>;
+            gpios = <&gpio5 2 GPIO_ACTIVE_LOW>;
+        };
+    };
+*/
+    sound-wm8960 {
+  		compatible = "fsl,imx7d-evk-wm8960",
+  			"fsl,imx-audio-wm8960";
+  		model = "wm8960-audio";
+		  audio-cpu = <&sai2>;
+  		audio-codec = <&wm8960>;
+  		codec-master;
+		  gpr = <&gpr 4 0x100000 0x100000>;
+		  // hp-det = <2 0>;
+		  hp-det-gpio = <&gpio4 22 0>;
+      mic-det-gpio = <&gpio4 22 0>;
+  		audio-routing =
+  			"Headphone Jack", "HP_L",
+  			"Headphone Jack", "HP_R",
+  			"Ext Spk", "SPK_LP",
+  			"Ext Spk", "SPK_LN",
+  			"Ext Spk", "SPK_RP",
+  			"Ext Spk", "SPK_RN",
+  			"LINPUT2", "Mic Jack",
+  			"RINPUT2", "Mic Jack",
+  			"Mic Jack", "MICB",
+  			"Playback", "CPU-Playback",
+  			"CPU-Capture", "Capture";
+        
+        /*,
+  			"CPU-Playback", "ASRC-Playback",
+  			"Playback", "CPU-Playback",
+  			"ASRC-Capture", "CPU-Capture",
+  			"CPU-Capture", "Capture";*/
+      /* JD2: hp detect high for headphone*/
+      /*
+      hp-det-gpio = <&gpio4 22 GPIO_ACTIVE_HIGH>;
+      mic-det-gpio = <&gpio4 22 GPIO_ACTIVE_HIGH>;
+      pinctrl-names = "default";
+      pinctrl-0 = <&pinctrl_sound_wm8960>; */
 	};
 };
 
@@ -58,6 +140,27 @@
 		spi-tx-bus-width = <1>;
 		spi-rx-bus-width = <4>;
 	};
+};
+
+&usbotg1 {
+	dr_mode = "otg";
+	/*extcon = <0>, <&typec1_ptn5110>;*/
+	picophy,pre-emp-curr-control = <3>;
+	picophy,dc-vol-level-adjust = <7>;
+	status = "okay";
+};
+
+&usbotg2 {
+	dr_mode = "host";
+	/*extcon = <0>, <&typec2_ptn5110>;*/
+	picophy,pre-emp-curr-control = <3>;
+	picophy,dc-vol-level-adjust = <7>;
+	status = "okay";
+};
+
+&{/busfreq} {
+	/* Disable busfreq, to avoid 1st Linux busfreq crash other inmates */
+	status = "disabled";
 };
 
 &usdhc1 {
@@ -158,6 +261,26 @@
 		fsl,pins = <
 			MX8MM_IOMUXC_GPIO1_IO00_ANAMIX_REF_CLK_32K	0x141
 			MX8MM_IOMUXC_SD1_DATA7_GPIO2_IO9		0x159
+		>;
+	};
+
+	pinctrl_gpio_led: gpioledgrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_NAND_READY_B_GPIO3_IO16	0x19
+		>;
+	};
+
+	pinctrl_gpio_keys: gpio_keys {
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI3_TXFS_GPIO4_IO31               0x19
+			MX8MM_IOMUXC_SAI3_RXFS_GPIO4_IO28               0x19
+			MX8MM_IOMUXC_SAI3_MCLK_GPIO5_IO2                0x19
+		>;
+	};
+ 
+ 	pinctrl_sound_wm8960: sound-wm8960grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI2_RXC_GPIO4_IO22	0x80
 		>;
 	};
 };

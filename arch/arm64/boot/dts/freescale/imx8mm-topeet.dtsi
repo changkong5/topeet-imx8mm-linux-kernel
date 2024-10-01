@@ -243,6 +243,17 @@
 		compatible = "rohm,dh2228fv";
 		spi-max-frequency = <500000>;
 	};
+	
+    can0: mcp2515@0 {
+    	compatible = "microchip,mcp2515";
+		pinctrl-0 = <&pinctrl_mcp2515>;
+        reg = <0>;
+        spi-max-frequency = <10000000>;
+        clocks = <&mcp251x_clock>;
+        interrupt-parent = <&gpio3>;
+        interrupts = <19 0x2>;
+		reset-gpio = <&gpio1 0 GPIO_ACTIVE_LOW>;
+    };
 };
 
 &fec1 {
@@ -432,6 +443,16 @@
 			self-powered;
 		};
 	};
+	
+	wm8960: wm8960@1a {
+        compatible = "wlf,wm8960";
+        reg = <0x1a>;
+        pinctrl-names = "default";
+        /* pinctrl-0 = <&pinctrl_wm8960_power_en>; */
+        wlf,shared-lrclk;
+        clocks = <&clk IMX8MM_CLK_SAI2_ROOT>;
+        clock-names = "mclk";
+    };
 };
 
 &i2c3 {
@@ -1079,6 +1100,12 @@
 	pinctrl_wdog: wdoggrp {
 		fsl,pins = <
 			MX8MM_IOMUXC_GPIO1_IO02_WDOG1_WDOG_B	0x166
+		>;
+	};
+	
+	pinctrl_mcp2515: mcp2515 {
+		fsl,pins = <
+			MX8MM_IOMUXC_GPIO1_IO00_GPIO1_IO0	0x41
 		>;
 	};
 };
