@@ -383,6 +383,9 @@ include $(srctree)/scripts/subarch.include
 # Note: Some architectures assign CROSS_COMPILE in their arch/*/Makefile
 ARCH		?= $(SUBARCH)
 
+ARCH = arm64
+CROSS_COMPILE = /opt/gcc-linaro-12.2.1-2022.12-x86_64_aarch64-linux-gnu/bin/aarch64-linux-gnu-
+
 # Architecture as present in compile.h
 UTS_MACHINE 	:= $(ARCH)
 SRCARCH 	:= $(ARCH)
