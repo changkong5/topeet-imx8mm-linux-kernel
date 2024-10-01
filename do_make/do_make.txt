@@ -1,0 +1,163 @@
+
+
+1> make imx8mm_topeet_defconfig
+
+2> make menuconfig
+
+3> make -j16
+
+
+
+arch/arm64/boot/Image
+arch/arm64/boot/dts/freescale/imx8mm-topeet.dtb
+
+
+
+arch/arm64/boot/dts/freescale/imx8mm-ddr4-evk.dtb
+arch/arm64/boot/dts/freescale/imx8mm-ddr4-evk-root.dtb
+arch/arm64/boot/dts/freescale/imx8mm-evk.dtb
+arch/arm64/boot/dts/freescale/imx8mm-evk-root.dtb
+
+
+$ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- imx8mm_topeet_defconfig
+$ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- menuconfig
+$ make ARCH=arm64 CROSS_COMPILE=aarch64-linux-gnu- -j12
+
+
+1> devicetree
+
+&{/busfreq} {
+  /* Disable busfreq, to avoid 1st Linux busfreq crash other inmates */
+  status = "disabled";
+};
+
+
+&usdhc1 {
+  status = "disabled";
+};
+
+// net reset pin configure
+&iomuxc {
+  pinctrl_fec1: fec1grp {
+    fsl,pins = <
+      /* MX8MM_IOMUXC_SAI2_RXC_GPIO4_IO22   0x19 */
+      MX8MM_IOMUXC_SD1_RESET_B_GPIO2_IO10   0x19
+    >;
+  };
+};
+
+// SD detect pin configure
+&usdhc2 {
+  // 更改cd引脚属性
+  cd-gpios = <&gpio2 12 GPIO_ACTIVE_LOW>;
+};
+
+&iomuxc {
+  pinctrl_usdhc2_gpio: usdhc2grpgpiogrp {
+    fsl,pins = <
+      MX8MM_IOMUXC_SD2_CD_B_GPIO2_IO12  0x1c4
+    >;
+  };
+};
+
+&lcdif {
+  status = "disabled";
+};
+
+&mipi_dsi {
+  status = "disabled";
+};
+
+
+
+1> cd /home/lsb/Desktop/Desktop/linux-utils-tools/i.MX-8MM/linux
+2> mkdir -p firmware/imx/sdma
+3> cp /home/lsb/Desktop/Desktop/linux-utils-tools/i.MX-8MM/firmware-imx-8.10/firmware-imx-8.1/firmware/sdma/sdma-imx7d.bin /home/lsb/Desktop/Desktop/linux-utils-tools/i.MX-8MM/linux/firmware/imx/sdma/sdma-imx7d.bin
+
+4> CONFIG_EXTRA_FIRMWARE_DIR=firmware
+
+5> CONFIG_EXTRA_FIRMWARE=imx/sdma/sdma-imx7d.bin
+
+5> CONFIG_EXTRA_FIRMWARE=imx/sdma/sdma-imx7d.bin regulatory.db regulatory.db.p7s
+
+// CONFIG_EXTRA_FIRMWARE="imx/sdma/sdma-imx6q.bin regulatory.db regulatory.db.p7s"
+
+(imx/sdma/sdma-imx7d.bin regulatory.db regulatory.db.p7s) Build named firmware blobs into the kernel binary
+(imx/sdma/sdma-imx7d.bin regulatory.db) Build named firmware blobs into the kernel binary
+(imx/sdma/sdma-imx7d.bin) Build named firmware blobs into the kernel binary   
+(firmware) Firmware blobs root directory 
+
+Symbol: EXTRA_FIRMWARE [=imx/sdma/sdma-imx7d.bin]
+Type  : string 
+Defined at drivers/base/firmware_loader/Kconfig:32
+  Prompt: Build named firmware blobs into the kernel binary
+  Depends on: FW_LOADER [=y]
+  Location:
+    -> Device Drivers
+      -> Generic Driver Options
+        -> Firmware loader
+(1)       -> Firmware loading facility (FW_LOADER [=y])
+
+
+Symbol: EXTRA_FIRMWARE_DIR [=firmware]
+Type  : string 
+Defined at drivers/base/firmware_loader/Kconfig:63
+  Prompt: Firmware blobs root directory
+  Depends on: FW_LOADER [=y] && EXTRA_FIRMWARE [=imx/sdma/sdma-imx7d.bin]!= 
+  Location:
+    -> Device Drivers
+      -> Generic Driver Options
+        -> Firmware loader
+          -> Firmware loading facility (FW_LOADER [=y])
+(2)         -> Build named firmware blobs into the kernel binary (EXTRA_FIRMWARE [=imx/sdma/sdma-imx7d.bin])          
+
+
+1> make imx8mm_topeet_defconfig
+
+2> make menuconfig
+
+3> make -j16
+
+
+u-boot=> setenv bootargs 'noinitrd console=ttymxc1,115200 root=/dev/mmcblk1p2 rw rootfstype=ext4 rootwait earlycon=ec_imx6q,0x30890000,115200'
+u-boot=> 
+u-boot=> setenv bootcmd "ext4load mmc 0:2 0x43000000 /boot/imx_5.15.32/imx8mm-topeet.dtb;ext4load mmc 0:2 0x40480000 /boot/imx_5.15.32/Image;booti 0x40480000 - 0x43000000"
+
+
+
+
+bootargs=noinitrd console=ttymxc1,115200 root=/dev/mmcblk1p2 rw rootfstype=ext4 rootwait
+bootcmd=ext4load mmc 1:2 0x43000000 /boot/imx_5.15.32/imx8mm-topeet.dtb;ext4load mmc 1:2 0x40480000 /boot/imx_5.15.32/Image;booti 0x40480000 - 0x43000000
+
+
+bootargs=noinitrd console=ttymxc1,115200 root=/dev/mmcblk1p3 rw rootfstype=ext4 rootwait
+bootcmd=ext4load mmc 1:3 0x43000000 /boot/imx_5.15.32/imx8mm-topeet.dtb;ext4load mmc 1:3 0x40480000 /boot/imx_5.15.32/Image;booti 0x40480000 - 0x43000000
+
+
+
+
+setenv bootargs 'noinitrd console=ttymxc1,115200 root=/dev/mmcblk1p3 rw rootfstype=ext4 rootwait'
+
+setenv bootcmd "ext4load mmc 1:3 0x43000000 /boot/imx_5.15.32/imx8mm-topeet.dtb;ext4load mmc 1:3 0x40480000 /boot/imx_5.15.32/Image;booti 0x40480000 - 0x43000000"
+
+
+
+
+
+
+
+
+
+
+│ Symbol: RTL8XXXU [=n]                                                                                                                                                                               │  
+  │ Type  : tristate                                                                                                                                                                                    │  
+  │ Defined at drivers/net/wireless/realtek/rtl8xxxu/Kconfig:5                                                                                                                                          │  
+  │   Prompt: RTL8723AU/RTL8188[CR]U/RTL819[12]CU (mac80211) support                                                                                                                                    │  
+  │   Depends on: NETDEVICES [=y] && WLAN [=y] && WLAN_VENDOR_REALTEK [=y] && MAC80211 [=y] && USB [=y]                                                                                                 │  
+  │   Location:                                                                                                                                                                                         │  
+  │     -> Device Drivers                                                                                                                                                                               │  
+  │       -> Network device support (NETDEVICES [=y])                                                                                                                                                   │  
+  │         -> Wireless LAN (WLAN [=y])                                                                                                                                                                 │  
+  │ (1)       -> Realtek devices (WLAN_VENDOR_REALTEK [=y]) 
+
+
