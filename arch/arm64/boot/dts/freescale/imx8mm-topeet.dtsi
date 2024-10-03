@@ -80,6 +80,7 @@
 		compatible = "linux,bt-sco";
 	};
 
+/*
 	sound-bt-sco {
 		compatible = "simple-audio-card";
 		simple-audio-card,name = "bt-sco-audio";
@@ -89,7 +90,7 @@
 		simple-audio-card,bitclock-master = <&btcpu>;
 
 		btcpu: simple-audio-card,cpu {
-			sound-dai = <&sai2>;
+			sound-dai = <&sai1>;
 			dai-tdm-slot-num = <2>;
 			dai-tdm-slot-width = <16>;
 		};
@@ -97,6 +98,8 @@
 		simple-audio-card,codec {
 			sound-dai = <&bt_sco_codec 1>;
 		};
+
+    
 	};
 
 	wm8524: audio-codec {
@@ -189,6 +192,7 @@
 		spdif-out;
 		spdif-in;
 	};
+*/
 
 	sound-micfil {
 		compatible = "fsl,imx-audio-card";
@@ -229,6 +233,40 @@
 	};
 };
 
+&ecspi1 {
+	pinctrl-names = "default";
+	pinctrl-0 = <&pinctrl_ecspi1>;
+	cs-gpios = <&gpio5 9 GPIO_ACTIVE_LOW>;
+	status = "okay";
+
+	st7789v: st7789v@0 {
+		compatible = "sitronix,st7789v";
+		reg = <0>;
+		spi-max-frequency = <8000000>;
+		status = "okay";
+
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_st7789v>;
+
+		// CPOL=1，CPHA=0
+		spi-cpha;		
+		spi-cpol;
+
+		regwidth = <8>;
+		buswidth = <8>;
+		width = <240>;
+		height = <240>;
+		rotate = <0>;
+		bpp = <16>;
+		fps = <50>;
+		// bgr;
+		debug = <0>;
+		reset-gpios = <&gpio4 29 GPIO_ACTIVE_LOW>;
+		dc-gpios = <&gpio5 0 GPIO_ACTIVE_HIGH>;
+		// led-gpios = <&gpio1 1 GPIO_ACTIVE_HIGH>;
+	};
+};
+
 &ecspi2 {
 	#address-cells = <1>;
 	#size-cells = <0>;
@@ -244,14 +282,14 @@
 		spi-max-frequency = <500000>;
 	};
 	
-    can0: mcp2515@0 {
+    can0: mcp2515@1 {
     	compatible = "microchip,mcp2515";
 		pinctrl-0 = <&pinctrl_mcp2515>;
-        reg = <0>;
+        reg = <1>;
         spi-max-frequency = <10000000>;
         clocks = <&mcp251x_clock>;
         interrupt-parent = <&gpio3>;
-        interrupts = <19 0x2>;
+        interrupts = <19 IRQ_TYPE_EDGE_FALLING>;
 		reset-gpio = <&gpio1 0 GPIO_ACTIVE_LOW>;
     };
 };
@@ -447,12 +485,28 @@
 	wm8960: wm8960@1a {
         compatible = "wlf,wm8960";
         reg = <0x1a>;
-        pinctrl-names = "default";
+        // pinctrl-names = "default";
         /* pinctrl-0 = <&pinctrl_wm8960_power_en>; */
         wlf,shared-lrclk;
         clocks = <&clk IMX8MM_CLK_SAI2_ROOT>;
         clock-names = "mclk";
     };
+    
+	rtc@32 {
+		compatible = "epson,rx8010";
+		reg = <0x32>;
+    status = "okay";
+	};
+/*	
+	rtc@32 {
+		compatible = "epson,rx8010";
+		pinctrl-names = "default";
+		pinctrl-0 = <&pinctrl_rtc>;
+		reg = <0x32>;
+		interrupt-parent = <&gpio4>;
+		interrupts = <10 IRQ_TYPE_LEVEL_HIGH>;
+	};
+ */
 };
 
 &i2c3 {
@@ -468,7 +522,7 @@
 		#gpio-cells = <2>;
 		vcc-supply = <&buck4_reg>;
 	};
-
+/*
 	ak4458_1: ak4458@10 {
 		#sound-dai-cells = <0>;
 		sound-name-prefix = "0";
@@ -505,7 +559,7 @@
 		DVDD-supply = <&reg_audio_board>;
 		dsd-path = <1>;
 	};
-
+*/
 	ov5640_mipi: ov5640_mipi@3c {
 		compatible = "ovti,ov5640_mipi";
 		reg = <0x3c>;
@@ -614,6 +668,7 @@
 	status = "disabled";
 };
 
+
 &sai2 {
 	#sound-dai-cells = <0>;
 	pinctrl-names = "default";
@@ -621,8 +676,22 @@
 	assigned-clocks = <&clk IMX8MM_CLK_SAI2>;
 	assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
 	assigned-clock-rates = <24576000>;
+  // assigned-clock-rates = <12288000>;
+  // assigned-clock-rates = <24000000>;
+  
 	status = "okay";
 };
+
+/*
+&sai2 {
+  pinctrl-names = "default";
+  pinctrl-0 = <&pinctrl_sai2>;
+  assigned-clocks = <&clk IMX8MM_CLK_SAI2_SRC>, <&clk IMX8MM_CLK_SAI2_DIV>;
+  assigned-clock-parents = <&clk IMX8MM_AUDIO_PLL1_OUT>;
+  assigned-clock-rates = <0>, <24000000>;
+  status = "okay";
+};
+*/
 
 &sai1 {
 	pinctrl-names = "default", "dsd";
@@ -642,6 +711,7 @@
 	status = "okay";
 };
 
+/*
 &sai3 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_sai3>;
@@ -667,6 +737,7 @@
 	dmas = <&sdma2 8 25 0>, <&sdma2 9 25 0>;
 	status = "disabled";
 };
+*/
 
 &sai6 {
 	fsl,sai-monitor-spdif;
@@ -678,6 +749,7 @@
 	status = "okay";
 };
 
+/*
 &spdif1 {
 	pinctrl-names = "default";
 	pinctrl-0 = <&pinctrl_spdif1>;
@@ -694,6 +766,7 @@
 		"rxtx4", "rxtx5", "rxtx6", "rxtx7", "spba", "pll8k", "pll11k";
 	status = "okay";
 };
+*/
 
 &uart1 { /* BT */
 	pinctrl-names = "default";
@@ -716,7 +789,8 @@
 	assigned-clocks = <&clk IMX8MM_CLK_UART3>;
 	assigned-clock-parents = <&clk IMX8MM_SYS_PLL1_80M>;
 	fsl,uart-has-rtscts;
-	status = "okay";
+	// status = "okay";
+	status = "disabled";
 };
 
 &usbotg1 {
@@ -796,6 +870,22 @@
 			MX8MM_IOMUXC_GPIO1_IO14_CCMSRCGPCMIX_CLKO1	0x59
 		>;
 	};
+	
+	pinctrl_ecspi1: ecspi1grp {
+		fsl,pins = <
+			MX8MM_IOMUXC_ECSPI1_SCLK_ECSPI1_SCLK		0x13
+			MX8MM_IOMUXC_ECSPI1_MOSI_ECSPI1_MOSI		0x13
+			MX8MM_IOMUXC_ECSPI1_MISO_ECSPI1_MISO		0x13
+			MX8MM_IOMUXC_ECSPI1_SS0_GPIO5_IO9			0x13
+		>;
+	};
+	
+	pinctrl_st7789v: st7789vgrp {
+		fsl,pins = <
+			MX8MM_IOMUXC_SAI3_TXC_GPIO5_IO0		0x13
+			MX8MM_IOMUXC_SAI3_RXC_GPIO4_IO29 	0x13
+		>;
+	};
 
 	pinctrl_ecspi2: ecspi2grp {
 		fsl,pins = <
@@ -807,7 +897,7 @@
 
 	pinctrl_ecspi2_cs: ecspi2cs {
 		fsl,pins = <
-			MX8MM_IOMUXC_ECSPI2_SS0_GPIO5_IO13		0x40000
+			MX8MM_IOMUXC_ECSPI2_SS0_GPIO5_IO13			0x40	/* 0x40000 */
 		>;
 	};
 
@@ -947,7 +1037,8 @@
 			MX8MM_IOMUXC_SAI1_TXD7_SAI1_TX_DATA7	0xd6
 		>;
 	};
-
+ 
+/*
 	pinctrl_sai2: sai2grp {
 		fsl,pins = <
 			MX8MM_IOMUXC_SAI2_TXC_SAI2_TX_BCLK      0xd6
@@ -956,6 +1047,18 @@
 			MX8MM_IOMUXC_SAI2_RXD0_SAI2_RX_DATA0    0xd6
 		>;
 	};
+*/
+
+		pinctrl_sai2: sai2grp {
+                        fsl,pins = <
+				MX8MM_IOMUXC_SAI2_TXFS_SAI2_TX_SYNC     0xd6
+				MX8MM_IOMUXC_SAI2_TXC_SAI2_TX_BCLK      0xd6
+				MX8MM_IOMUXC_SAI2_MCLK_SAI2_MCLK        0xd6
+				MX8MM_IOMUXC_SAI2_TXD0_SAI2_TX_DATA0    0xd6
+				MX8MM_IOMUXC_SAI2_RXD0_SAI2_RX_DATA0    0xd6
+				MX8MM_IOMUXC_SAI2_RXC_GPIO4_IO22        0xd6    
+			>;
+		};
 
 	pinctrl_sai3: sai3grp {
 		fsl,pins = <
@@ -1106,6 +1209,7 @@
 	pinctrl_mcp2515: mcp2515 {
 		fsl,pins = <
 			MX8MM_IOMUXC_GPIO1_IO00_GPIO1_IO0	0x41
+			MX8MM_IOMUXC_SAI5_RXFS_GPIO3_IO19	0x140
 		>;
 	};
 };

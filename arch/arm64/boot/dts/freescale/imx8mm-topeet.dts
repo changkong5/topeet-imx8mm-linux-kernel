@@ -77,8 +77,9 @@
   		codec-master;
 		  gpr = <&gpr 4 0x100000 0x100000>;
 		  // hp-det = <2 0>;
-		  hp-det-gpio = <&gpio4 22 0>;
-      mic-det-gpio = <&gpio4 22 0>;
+		  // hp-det = <3 0>;
+		  // hp-det-gpio = <&gpio4 22 GPIO_ACTIVE_LOW>;
+      	// mic-det-gpio = <&gpio4 22 0>;
   		audio-routing =
   			"Headphone Jack", "HP_L",
   			"Headphone Jack", "HP_R",
